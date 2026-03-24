@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "com.bitchat.android"
+    namespace = "com.chriscorp.celer"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.bitchat.droid"
+        applicationId = "com.chriscorp.celer"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 22
-        versionName = "1.3.1"
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
