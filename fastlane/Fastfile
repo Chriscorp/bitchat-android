@@ -1,0 +1,88 @@
+default_platform(:android)
+
+platform :android do
+  desc "Run all unit tests"
+  lane :test do
+    gradle(task: "test", build_type: "Debug")
+  end
+
+  desc "Run lint checks"
+  lane :lint do
+    gradle(task: "lint", build_type: "Debug")
+  end
+
+  desc "Build a debug APK"
+  lane :build_debug do
+    gradle(task: "assemble", build_type: "Debug")
+  end
+
+  desc "Build a signed release APK"
+  lane :build_release do
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"] || "celer.keystore",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"] || "celer-key",
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"] || ENV["KEYSTORE_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Build a signed Android App Bundle (AAB) for release"
+  lane :build_bundle do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV["KEYSTORE_PATH"] || "celer.keystore",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"] || "celer-key",
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"] || ENV["KEYSTORE_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Deploy to Google Play internal testing track"
+  lane :deploy_internal do
+    build_bundle
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy to Google Play beta track"
+  lane :deploy_beta do
+    build_bundle
+    upload_to_play_store(
+      track: "beta",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy to Google Play production track"
+  lane :deploy_production do
+    build_bundle
+    upload_to_play_store(
+      track: "production",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
